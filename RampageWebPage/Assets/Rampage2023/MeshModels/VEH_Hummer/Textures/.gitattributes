@@ -1,0 +1,4 @@
+RedBull_HV_D.tga filter=lfs diff=lfs merge=lfs -text
+RedBull_HV_Glass_D.tga filter=lfs diff=lfs merge=lfs -text
+RedBull_HV_Int_D.tga filter=lfs diff=lfs merge=lfs -text
+RedBull_Wheels_D.tga filter=lfs diff=lfs merge=lfs -text

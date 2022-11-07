@@ -1,4 +1,5 @@
 mergeInto(LibraryManager.library, {
+
   Hello: function () {
     window.alert("Hello, world!");
   },
@@ -40,17 +41,25 @@ mergeInto(LibraryManager.library, {
   CurrentScrollPosition: function () {
     return document.documentElement.scrollTop;
   },
+    
+  ChangeScrollByUnity: function (deltaScroll) {
+    window.pageYOffset += deltaScroll;
+  },
   
-  SendCurrentAnimationFrame: function (currentFrame) {
-    var animationFrame = document.getElementById("current-animation-frame");
-    
-    if(animationFrame == null) {
-     animationFrame = document.createElement("current-animation-frame");
-     animationFrame.id = "current-animation-frame";
-     document.body.appendChild(animationFrame);
-     console.log("Variable with name 'current-animation-frame' created by Unity webgl app. You can access the current animation frame of the webgl canvas by this element on the property 'current-frame'");
-    }
-    
-    animationFrame.setAttribute("current-frame", currentFrame);
+  scrollWindowsToNewPos: function (x, y) {
+      if(isNaN(x) || isNaN(y)){
+          console.logerror("NAN", x, y)
+          return;
+      } 
+  
+      var numX = Number(x);
+      var numY = Number(y);
+  
+      uss.scrollTo(numX, numY, window,  () => console.log("dOnE"));   
+      uss.stopScrolling();
   },  
+  
+  IsMobileBrowser: function () {
+      return (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    },
 });

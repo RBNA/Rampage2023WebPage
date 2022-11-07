@@ -12,8 +12,7 @@ public class TrackController : MonoBehaviour
     [SerializeField] private RiderData _riderData;
     [SerializeField] private float _highlightScaleMultiplier = 1.25f;
     [SerializeField] private Material _highlightMaterial;
-
-
+    
     [SerializeField] private bool _debugSpline;
 
     [ShowIf("_debugSpline")] [SerializeField] [Range(0.0f, 1.0f)]
@@ -42,10 +41,7 @@ public class TrackController : MonoBehaviour
         _originalPointSize = _splineComputer.GetPointSize(0);
         _originalMaterial = _meshRenderer.material;
 
-        _clickableElement = GetComponent<ClickableElement>();
-        _clickableElement.onMouseClick.AddListener(OnMouseClickTrack);
-        _clickableElement.onMouseHoverEnter.AddListener(OnMouseHoverTrack);
-        _clickableElement.onMouseHoverExit.AddListener(OnMouseHoverExitTrack);
+        ConfigTrackInteractions();
     }
 
     private void Update()
@@ -61,18 +57,14 @@ public class TrackController : MonoBehaviour
 #endif
     }
 
-    public void SetTrackPosition(float value)
+    private void ConfigTrackInteractions()
     {
-        float clampedValue = Mathf.Clamp01(value);
-
-        //The spline was made inverse so when 0 = totally revealed, and 1 = nothing revealed
-        _splineRenderer.clipFrom = 1 - clampedValue;
-        _splinePositioner.clipFrom = 1 - clampedValue;
-
-        bool trackBeenRevealed = clampedValue is > 0 and < 1;
-        _particleObject.SetActive(trackBeenRevealed);
+        _clickableElement = GetComponent<ClickableElement>();
+        _clickableElement.onMouseClick.AddListener(OnMouseClickTrack);
+        _clickableElement.onMouseHoverEnter.AddListener(OnMouseHoverTrack);
+        _clickableElement.onMouseHoverExit.AddListener(OnMouseHoverExitTrack);
     }
-
+    
     private void ChangeColor(float sizeMultiplier, Material material)
     {
         //     for (int i = 0; i < _splineComputer.pointCount; i++)
@@ -95,7 +87,29 @@ public class TrackController : MonoBehaviour
 
     private void OnMouseClickTrack()
     {
-        _riderPanel.gameObject.SetActive(true);
+        ShowRiderPanel();
+    }
+
+    public void ShowRiderPanel()
+    {
         _riderPanel.Populate(_riderData);
+        _riderPanel.gameObject.SetActive(true);
+    }
+    
+    public void SetTrackPosition(float value)
+    {
+        float clampedValue = Mathf.Clamp01(value);
+
+        //The spline was made inverse so when 0 = totally revealed, and 1 = nothing revealed
+        _splineRenderer.clipFrom = 1 - clampedValue;
+        _splinePositioner.clipFrom = 1 - clampedValue;
+
+        bool trackBeenRevealed = clampedValue is > 0 and < 1;
+        _particleObject.SetActive(trackBeenRevealed);
+    }
+
+    public RiderData GetRiderData()
+    {
+        return _riderData;
     }
 }

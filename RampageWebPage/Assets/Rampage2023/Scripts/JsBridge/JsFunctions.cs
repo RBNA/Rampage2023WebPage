@@ -24,6 +24,9 @@ public class JsFunctions : MonoBehaviour {
     [DllImport("__Internal")]
     private static extern void FireTrigger(int triggerId);
     
+    [DllImport("__Internal")]
+    private static extern void ChangeScrollByUnity(int deltaScroll);
+
     void Start() {
         Hello();
         

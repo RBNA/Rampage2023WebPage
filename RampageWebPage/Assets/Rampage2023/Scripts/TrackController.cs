@@ -50,6 +50,7 @@ public class TrackController : MonoBehaviour
 
     private void Update()
     {
+#if UNITY_EDITOR
         if (_debugSpline)
         {
             if (Math.Abs(_lastPositionSet - _currentTrackPos) < 0.001f) return;
@@ -57,6 +58,7 @@ public class TrackController : MonoBehaviour
 
             SetTrackPosition(_currentTrackPos);
         }
+#endif
     }
 
     public void SetTrackPosition(float value)

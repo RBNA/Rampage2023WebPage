@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Dreamteck.Splines;
 using InteractableElements;
 using NaughtyAttributes;
@@ -10,37 +11,29 @@ public class TrackController : MonoBehaviour
     [SerializeField] private GameObject _particleObject;
     [SerializeField] private RiderPanel _riderPanel;
     [SerializeField] private RiderData _riderData;
-    [SerializeField] private float _highlightScaleMultiplier = 1.25f;
     [SerializeField] private Material _highlightMaterial;
+
+    [SerializeField] private List<TriggerData> _triggers = new();
     
     [SerializeField] private bool _debugSpline;
 
     [ShowIf("_debugSpline")] [SerializeField] [Range(0.0f, 1.0f)]
     private float _currentTrackPos = 0;
 
-    private SplineComputer _splineComputer;
     private SplineRenderer _splineRenderer;
     private SplinePositioner _splinePositioner;
     private ClickableElement _clickableElement;
 
     private float _lastPositionSet = -1;
-    private float _originalPointSize;
     private MeshRenderer _meshRenderer;
     private Material _originalMaterial;
 
     private void Awake()
     {
-        _splineComputer = GetComponent<SplineComputer>();
-        _splineRenderer = GetComponent<SplineRenderer>();
-        _splinePositioner = _particleObject.GetComponent<SplinePositioner>();
-
-        _splineRenderer.clipFrom = 0;
-        _splinePositioner.clipFrom = 0;
-
         _meshRenderer = GetComponent<MeshRenderer>();
-        _originalPointSize = _splineComputer.GetPointSize(0);
         _originalMaterial = _meshRenderer.material;
 
+        ConfigSpline();
         ConfigTrackInteractions();
     }
 
@@ -64,25 +57,29 @@ public class TrackController : MonoBehaviour
         _clickableElement.onMouseHoverEnter.AddListener(OnMouseHoverTrack);
         _clickableElement.onMouseHoverExit.AddListener(OnMouseHoverExitTrack);
     }
-    
-    private void ChangeColor(float sizeMultiplier, Material material)
+
+    private void ConfigSpline()
     {
-        //     for (int i = 0; i < _splineComputer.pointCount; i++)
-        //     {
-        //         _splineComputer.SetPointSize(i, _originalPointSize * sizeMultiplier);
-        //     }
+        _splineRenderer = GetComponent<SplineRenderer>();
+        _splinePositioner = _particleObject.GetComponent<SplinePositioner>();
+        
+        _splineRenderer.clipFrom = 0;
+        _splinePositioner.clipFrom = 0;
+    }
+
+    private void ChangeColor(Material material)
+    {
         _meshRenderer.material = material;
     }
 
     private void OnMouseHoverTrack()
     {
-        ChangeColor(_highlightScaleMultiplier, _highlightMaterial);
+        ChangeColor(_highlightMaterial);
     }
 
     private void OnMouseHoverExitTrack()
     {
-        float reduceMultiplier = 2 * _originalPointSize - (_originalPointSize * _highlightScaleMultiplier);
-        ChangeColor(reduceMultiplier, _originalMaterial);
+        ChangeColor(_originalMaterial);
     }
 
     private void OnMouseClickTrack()
@@ -106,6 +103,13 @@ public class TrackController : MonoBehaviour
 
         bool trackBeenRevealed = clampedValue is > 0 and < 1;
         _particleObject.SetActive(trackBeenRevealed);
+
+        for (int i = 0; i < _triggers.Count; i++)
+        {
+            TriggerData trigger = _triggers[i];
+            bool isActive = trigger.TrackPercentPosition > 1 - clampedValue;
+            trigger.gameObject.SetActive(isActive);
+        }
     }
 
     public RiderData GetRiderData()
